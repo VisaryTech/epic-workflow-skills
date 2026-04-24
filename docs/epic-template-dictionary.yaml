@@ -1,0 +1,95 @@
+subsystem:
+  label: "Подсистема"
+  type: text
+
+module:
+  label: "Модуль / блок"
+  type: text
+
+requirement-source:
+  label: "Источник требования"
+  type: text
+
+author:
+  label: "Автор эпика"
+  type: text
+
+functional-customer:
+  label: "ФЗ (функциональный заказчик)"
+  type: text
+
+decision-maker:
+  label: "ЛПР (принимающий решение)"
+  type: text
+
+business-goal:
+  label: "Цель"
+  type: text
+
+problem:
+  label: "Проблема"
+  type: text
+
+expected-effect:
+  label: "Ожидаемый эффект"
+  type: text
+
+as-is:
+  label: "AS-IS (текущее состояние)"
+  type: text
+
+to-be-logic:
+  label: "Общая логика"
+  type: text
+
+to-be-rules-and-constraints:
+  label: "Правила / ограничения"
+  type: text
+
+ui-change-area:
+  label: "Зона изменений"
+  type: text
+
+ui-structure:
+  label: "Структура / порядок блоков"
+  type: text
+
+ui-display-requirements:
+  label: "Требования к отображению"
+  type: text
+
+main-scenario:
+  label: "Основной сценарий"
+  type: text
+
+alternative-scenarios:
+  label: "Альтернативные сценарии"
+  type: text
+
+acceptance-criteria:
+  label: "Acceptance Criteria"
+  type: text
+
+scope:
+  label: "Scope (входит в задачу)"
+  type: text
+
+out-of-scope:
+  label: "Out of Scope (не входит)"
+  type: text
+
+constraints:
+  label: "Ограничения"
+  type: text
+
+risks-and-assumptions:
+  label: "Риски и допущения"
+  type: text
+
+dependencies:
+  label: "Зависимости"
+  type: text
+
+additional-materials:
+  label: "Дополнительные материалы"
+  type: text

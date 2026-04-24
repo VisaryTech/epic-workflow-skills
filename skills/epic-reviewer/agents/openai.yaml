@@ -1,0 +1,4 @@
+interface:
+  display_name: "Epic Readiness Check"
+  short_description: "Formal epic review with structured verdict, blockers, and readiness decision"
+  default_prompt: "Review this epic for development readiness, re-read it from ERP, classify gaps/risks/conflicts, and return a structured APPROVED or TO DEFINE verdict"

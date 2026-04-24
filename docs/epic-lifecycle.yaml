@@ -1,0 +1,53 @@
+version: 1
+
+statuses:
+  - key: draft
+    label_env: ERP_LABEL_DRAFT
+    transitions_to:
+      - to-approve
+
+  - key: to-approve
+    label_env: ERP_LABEL_TO_APPROVE
+    transitions_to:
+      - approved
+      - to-define
+
+  - key: to-define
+    label_env: ERP_LABEL_TO_DEFINE
+    transitions_to:
+      - to-approve
+
+  - key: approved
+    label_env: ERP_LABEL_APPROVED
+    transitions_to:
+      - plan-to-approve
+
+  - key: plan-to-approve
+    label_env: ERP_LABEL_PLAN_TO_APPROVE
+    transitions_to:
+      - plan-approved
+      - to-define
+
+  - key: plan-approved
+    label_env: ERP_LABEL_PLAN_APPROVED
+    transitions_to:
+      - ready
+
+  - key: ready
+    label_env: ERP_LABEL_READY
+    transitions_to: []
+
+markers:
+  plan_epic_label_env: ERP_LABEL_EPIC_PLAN
+
+summaries:
+  pre_planning:
+    - draft
+    - to-approve
+    - to-define
+  planning_pipeline:
+    - approved
+    - plan-to-approve
+    - plan-approved
+  ready:
+    - ready

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Epic Workflow"
+  short_description: "Epic lifecycle orchestration pack"
+  default_prompt: "Use local epic workflow skills, docs, scripts, and configs from this repository to execute epic-related tasks end-to-end."
