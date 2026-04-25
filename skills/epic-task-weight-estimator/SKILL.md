@@ -120,7 +120,7 @@ description: Оценивает вес всех задач эпика в ERP Tas
 10. Для каждой оставшейся задачи прочитай текст и проверь, что содержания достаточно для оценки. Если нет, фиксируй `reason code = task_text_missing`.
 11. Для каждой валидной задачи рассчитай `research_hours`, `implementation_hours`, `base_hours`, `risk_level`, `risk_adjustment_hours`, `final_weight`.
 12. Сохрани `final_weight` в поле `weight` через ERP endpoint `PATCH /Task/command/ChangeWeight/{taskId}`.
-    - CLI shape: `python api.py -m patch_task_command_change_weight_task_id --posarg <task_id> --arg body='{"weight":<hours>}'`
+    - Используй `visary-cloud-api-skills` и его TaskTracker API capability; не запускай напрямую внешние API CLI-скрипты.
 13. После успешного обновления веса обязательно добавь комментарий с деталями расчёта через ERP endpoint `POST /TaskComment/command/Create`.
 14. Используй единый шаблон комментария из `references/weight-comment-template.md`.
 15. Если комментарий добавить не удалось, не считай задачу успешно обработанной и фиксируй `reason code = task_comment_failed`.

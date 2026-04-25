@@ -1,21 +1,25 @@
 import json
+import os
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stdout
-from io import StringIO
 from pathlib import Path
 from unittest import mock
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-import build_epic_status_report
 import build_erp_url
 import erp_config
 
 
 class ErpConfigTests(unittest.TestCase):
+    def test_default_config_path_is_user_config_file(self):
+        self.assertEqual(
+            erp_config.CONFIG_PATH,
+            Path(os.path.expanduser("~/.config/erp-env.json")),
+        )
+
     def test_load_known_keys_uses_lifecycle_statuses(self):
         lifecycle = {
             "status_env_map": {
@@ -78,41 +82,52 @@ class BuildErpUrlTests(unittest.TestCase):
         self.assertEqual(payload["missing"], ["project_id"])
 
 
-class BuildEpicStatusReportTests(unittest.TestCase):
-    def test_fetch_epics_paginates_beyond_first_page(self):
-        pages = [
-            {"value": [{"ID": str(index), "Title": f"Epic {index}", "Labels": []} for index in range(100)]},
-            {"value": [{"ID": str(index), "Title": f"Epic {index}", "Labels": []} for index in range(100, 200)]},
-            {"value": [{"ID": "200", "Title": "Epic 200", "Labels": []}]},
+class DirectTaskTrackerCallRegressionTests(unittest.TestCase):
+    def _read_repository_text_files(self):
+        root = Path(__file__).resolve().parents[1]
+        text_suffixes = {".md", ".py", ".yaml", ".yml", ".json", ".example"}
+
+        for path in root.rglob("*"):
+            if not path.is_file() or path.suffix not in text_suffixes:
+                continue
+            if any(part in {".git", "__pycache__"} for part in path.parts):
+                continue
+            yield root, path, path.read_text(encoding="utf-8")
+
+    def test_repository_does_not_call_external_tasktracker_scripts_directly(self):
+        forbidden = [
+            "python " + "api.py",
+            "TASKTRACKER" + "_DIR",
+            "skills/" + "tasktracker-api",
+            "skills\\" + "tasktracker-api",
+            "patch_task_command" + "_change_weight_task_id",
         ]
 
-        def fake_run_json(cmd, cwd=None, reason=None):
-            skip_arg = next(item for item in cmd if item.startswith("$skip="))
-            skip = int(skip_arg.split("=", 1)[1])
-            return pages[skip // 100]
+        offenders = []
+        for root, path, content in self._read_repository_text_files():
+            for token in forbidden:
+                if token in content:
+                    offenders.append(f"{path.relative_to(root)}: {token}")
 
-        with mock.patch.object(build_epic_status_report, "run_json", side_effect=fake_run_json):
-            epics = build_epic_status_report.fetch_epics("123", "Labels/any(...)")
+        self.assertEqual(offenders, [])
 
-        self.assertEqual(len(epics), 201)
-        self.assertEqual(epics[0]["ID"], "0")
-        self.assertEqual(epics[-1]["ID"], "200")
-
-    def test_fetch_epics_fails_on_duplicate_page_items(self):
-        pages = [
-            {"value": [{"ID": str(index), "Title": f"Epic {index}", "Labels": []} for index in range(100)]},
-            {"value": [{"ID": "99", "Title": "Epic 99 duplicate", "Labels": []}]},
+    def test_erp_dependency_contract_points_to_visary_cloud_api_skills(self):
+        root = Path(__file__).resolve().parents[1]
+        required_files = [
+            "SKILL.md",
+            "README.md",
+            "references/skill-map.md",
+            "skills/epic-task-weight-estimator/SKILL.md",
         ]
+        missing = []
 
-        def fake_run_json(cmd, cwd=None, reason=None):
-            skip_arg = next(item for item in cmd if item.startswith("$skip="))
-            skip = int(skip_arg.split("=", 1)[1])
-            return pages[skip // 100]
+        for relative_path in required_files:
+            path = root / relative_path
+            content = path.read_text(encoding="utf-8")
+            if "visary-cloud-api-skills" not in content:
+                missing.append(relative_path)
 
-        with mock.patch.object(build_epic_status_report, "run_json", side_effect=fake_run_json):
-            with redirect_stdout(StringIO()):
-                with self.assertRaises(SystemExit):
-                    build_epic_status_report.fetch_epics("123", "Labels/any(...)")
+        self.assertEqual(missing, [])
 
 
 if __name__ == "__main__":

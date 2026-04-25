@@ -6,7 +6,8 @@ from pathlib import Path
 from load_epic_lifecycle import LifecycleError, load_lifecycle
 
 WORKSPACE = Path(__file__).resolve().parents[1]
-CONFIG_PATH = WORKSPACE / "config" / "erp-env.json"
+CONFIG_FILE_PATH = "~/.config/erp-env.json"
+CONFIG_PATH = Path(os.path.expanduser(CONFIG_FILE_PATH))
 CONFIG_EXAMPLE_PATH = WORKSPACE / "config" / "erp-env.json.example"
 BASE_KEYS = [
     "ERP_BASE_URL",
@@ -33,15 +34,16 @@ def normalize(value) -> str | None:
     return text or None
 
 
-def read_local_config(path: Path = CONFIG_PATH) -> dict:
+def read_local_config(path: str | Path = CONFIG_FILE_PATH) -> dict:
+    config_path = Path(os.path.expanduser(str(path)))
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(config_path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return {}
     except Exception as exc:
         raise ConfigError(
             "invalid_config",
-            config_path=str(path),
+            config_path=str(config_path),
             config_example_path=str(CONFIG_EXAMPLE_PATH),
             error=str(exc),
         ) from exc
@@ -49,7 +51,7 @@ def read_local_config(path: Path = CONFIG_PATH) -> dict:
     if not isinstance(data, dict):
         raise ConfigError(
             "invalid_config",
-            config_path=str(path),
+            config_path=str(config_path),
             config_example_path=str(CONFIG_EXAMPLE_PATH),
             error="config root must be a JSON object",
         )
@@ -70,7 +72,7 @@ def load_known_keys() -> list[str]:
 
 
 def resolve_config_items() -> tuple[list[dict], list[str]]:
-    config = read_local_config(CONFIG_PATH)
+    config = read_local_config()
     items = []
     missing = []
 

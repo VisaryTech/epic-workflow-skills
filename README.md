@@ -1,6 +1,6 @@
 # Epic Workflow Skills
 
-Пакет skills для работы с жизненным циклом эпиков: создание, очистка, review, доработка, подготовка implementation plan, декомпозиция в dev-задачи, batch-обработка, отчеты и оценка веса задач.
+Пакет skills для работы с жизненным циклом эпиков: создание, очистка, review, доработка, подготовка плана реализации, декомпозиция в dev-задачи и оценка веса задач.
 
 Главная точка входа - [`SKILL.md`](SKILL.md). Она маршрутизирует запросы в специализированные дочерние skills из [`skills/`](skills).
 
@@ -12,7 +12,7 @@
 |-- agents/
 |   `-- openai.yaml                  # настройки агента для пакета
 |-- config/
-|   `-- erp-env.json.example         # пример локальной ERP-конфигурации
+|   `-- erp-env.json.example         # пример пользовательской ERP-конфигурации
 |-- docs/                            # общая доменная база epic workflow
 |   |-- epic-workflow.md             # человекочитаемые правила процесса
 |   |-- epic-lifecycle.yaml          # machine-readable lifecycle и ERP label mapping
@@ -31,7 +31,6 @@
 |   |-- erp_config.py                # загрузка и валидация ERP-конфига
 |   |-- get_erp_envs.py              # диагностика доступных ERP env values
 |   |-- build_erp_url.py             # построение canonical ERP URL
-|   |-- build_epic_status_report.py  # сбор отчета по статусам эпиков
 |   `-- load_epic_lifecycle.py       # загрузка docs/epic-lifecycle.yaml
 |-- skills/
 |   |-- epic-creator/
@@ -40,9 +39,6 @@
 |   |-- epic-refiner/
 |   |-- epic-dev-plan-creator/
 |   |-- epic-task-creator/
-|   |-- epic-dev-plan-batch/
-|   |-- epic-dev-task-batch/
-|   |-- epic-status-report/
 |   `-- epic-task-weight-estimator/
 `-- tests/
     `-- test_scripts.py
@@ -52,21 +48,29 @@
 
 - `docs/` - общий источник правил, терминов, lifecycle, шаблонов и quality gates. Дочерние skills должны ссылаться на эти документы, а не дублировать общие правила.
 - `skills/` - исполняемый capability-слой. Каждый подкаталог содержит отдельный `SKILL.md` и, при необходимости, свои `references/`, `assets/` или `agents/`.
-- `scripts/` - вспомогательные Python-скрипты для конфигурации, построения ERP-ссылок и отчетов.
-- `config/` - локальная конфигурация ERP. Файл `erp-env.json` не должен попадать в git.
+- `scripts/` - вспомогательные Python-скрипты для конфигурации и построения ERP-ссылок.
+- `config/` - пример пользовательской ERP-конфигурации. Реальный `erp-env.json` хранится вне репозитория.
 - `references/` - короткие навигационные материалы по пакету.
+
+## Runtime dependencies
+
+- Для ERP TaskTracker read/write операций должен быть установлен `visary-cloud-api-skills`.
+- Этот пакет использует TaskTracker API capability внутри `visary-cloud-api-skills`.
+- Локальные скрипты этого репозитория не вызывают внутренние API CLI-скрипты `visary-cloud-api-skills` напрямую.
+- ERP-конфиг хранится отдельно в `~/.config/erp-env.json`.
 
 ## Конфигурация
 
-### 1. Создать локальный ERP-конфиг
+### 1. Создать пользовательский ERP-конфиг
 
 Скопируйте пример:
 
 ```powershell
-Copy-Item config/erp-env.json.example config/erp-env.json
+New-Item -ItemType Directory -Force ~/.config
+Copy-Item config/erp-env.json.example ~/.config/erp-env.json
 ```
 
-Заполните реальные значения в `config/erp-env.json`:
+Заполните реальные значения в `~/.config/erp-env.json`:
 
 ```json
 {
@@ -90,16 +94,16 @@ Copy-Item config/erp-env.json.example config/erp-env.json
 - `plan_epic_label_env` задает label для child epic с implementation plan.
 - `status_env_map` задает label env key для каждого lifecycle status.
 
-Если в lifecycle добавляется новый статус, нужно обновить `docs/epic-lifecycle.yaml`, затем добавить соответствующее значение в `config/erp-env.json`.
+Если в lifecycle добавляется новый статус, нужно обновить `docs/epic-lifecycle.yaml`, затем добавить соответствующее значение в `~/.config/erp-env.json`.
 
 ### 3. Приоритет источников конфигурации
 
 Скрипты читают значения в таком порядке:
 
 1. Переменные окружения.
-2. Локальный файл `config/erp-env.json`.
+2. Пользовательский файл `~/.config/erp-env.json`.
 
-Это позволяет временно переопределять значения без изменения локального конфига.
+Это позволяет временно переопределять значения без изменения пользовательского конфига.
 
 Пример:
 
@@ -117,7 +121,7 @@ python scripts/get_erp_envs.py
 Команда выводит JSON с:
 
 - `ok` - удалось ли загрузить конфигурацию;
-- `config_path` - путь к локальному конфигу;
+- `config_path` - путь к пользовательскому конфигу;
 - `config_example_path` - путь к примеру;
 - `items` - найденные значения и источник каждого значения;
 - `missing` - список отсутствующих обязательных ключей.
