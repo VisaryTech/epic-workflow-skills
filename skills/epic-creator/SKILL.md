@@ -74,8 +74,8 @@ description: "Пошаговый мастер создания нового epic
    - выполни screening по `../../docs/epic-readiness-preflight.md` и определи исход `not_ready | ready_for_create`;
    - сформируй `Название epic` и `Краткое описание epic`;
    - выполни naming-check по `../../docs/epic-naming.md`;
-   - если title не состоит ровно из трёх частей `Подсистема / Блок_или_Модуль / Функционал` или перегружен условиями, деталями, логикой, критериями приёмки либо фразами вида `если`, `при`, `по дате`, `о необходимости`, верни `❌ failed` с common `reason code: naming_not_stable`;
-   - если данных недостаточно для осмысленного создания epic, верни common `reason code` + при необходимости `detail reason`.
+   - если title не состоит ровно из трёх частей `Подсистема / Блок_или_Модуль / Функционал` или перегружен условиями, деталями, логикой, критериями приёмки либо фразами вида `если`, `при`, `по дате`, `о необходимости`, верни not-ready ответ с `reason: naming_not_stable` в служебной строке;
+   - если данных недостаточно для осмысленного создания epic, верни not-ready ответ с common `reason` и при необходимости `detail` в служебной строке.
 
 3. **Optional cleanup before create**
    - если пользователь явно просит очистить текст от воды до создания epic, выполни cleanup в рамках текущего текста без промежуточного сохранения;
@@ -91,7 +91,7 @@ description: "Пошаговый мастер создания нового epic
 5. **Create epic in ERP**
    - выполняй только после подтверждения пользователя;
    - перед ERP write повторно проверь, что title прошёл naming-check по `../../docs/epic-naming.md`;
-   - если title не прошёл naming-check, не выполняй create-stage и верни `❌ failed` с `reason code: naming_not_stable`;
+   - если title не прошёл naming-check, не выполняй create-stage и верни not-ready ответ с `reason: naming_not_stable` в служебной строке;
    - сначала выполни ERP preflight и получи ERP config через `python scripts/get_erp_envs.py`;
    - используй ERP API;
    - создавай epic без догадок о полях;
@@ -127,11 +127,35 @@ Minimum context:
 ## Формат результата
 
 ### Epic not ready
-- `status:` `❌ failed`
-- `reason code:` common reason code
-- `detail reason:` local detail reason, если нужен
-- `missing:` список недостающих placeholder names или критичных пробелов
-- `next step:` какой блок нужно закрыть дальше
+Для business-intake сценариев не начинай ответ с технических полей `status`, `reason code`, `missing`.
+
+Структура ответа:
+- человекочитаемый итог: чего не хватает и почему нельзя перейти к create-stage;
+- `Название epic` и `Краткое описание epic`, если они уже сформированы; если нет, опускай соответствующую секцию целиком;
+- конкретный запрос недостающих данных с русскими названиями из `../../docs/epic-template-dictionary.yaml`;
+- короткая служебная строка в конце: `not_ready`, common reason code, placeholder names и local detail reason, если нужен.
+
+Пример для 1-3 недостающих полей:
+
+```md
+Не хватает двух пунктов, чтобы собрать epic для создания.
+
+Название epic:
+<canonical_title>
+
+Краткое описание epic:
+<short_summary>
+
+Уточните, пожалуйста:
+- ФЗ: кто функциональный заказчик
+- ЛПР: кто принимает решение по epic
+
+После этого я соберу финальную заготовку для создания epic.
+
+Служебно: not_ready, reason: missing_input (`functional-customer`, `decision-maker`)
+```
+
+Для runtime/config/preflight failures, не связанных с business-intake, можно начинать с `❌ failed`, если это быстрее объясняет технический сбой.
 
 ### Ready to create
 
@@ -172,9 +196,10 @@ Minimum context:
 
 ## Смоук-чек
 
-- Вход: недостаточно данных для `business-goal`, `scope` или `acceptance-criteria` → ожидается `❌ failed` с common `reason code`, списком `missing` и `next step`.
+- Вход: недостаточно данных для `business-goal`, `scope` или `acceptance-criteria` → ожидается человекочитаемый not-ready ответ с `not_ready`, common `reason` в служебной строке, списком недостающих placeholder names и конкретным next step.
+- Вход: title `РТ / Словарь терминов / Ведение и согласование` и short summary сформированы, но не хватает `functional-customer`, `decision-maker` → ожидается ответ, который начинается с понятного итога, показывает title/summary, просит ФЗ и ЛПР, а `not_ready, reason: missing_input` вынесен в служебную строку.
 - Вход: текст готов к созданию, но пользователь ещё не подтвердил create → ожидается `✅ Данные для создания epic готовы`.
-- Вход: title без `/`, из 2/4 частей или с фразами `если`, `при`, `по дате`, `о необходимости` → ожидается `❌ failed`, `reason code = naming_not_stable`, без create-stage.
+- Вход: title без `/`, из 2/4 частей или с фразами `если`, `при`, `по дате`, `о необходимости` → ожидается not-ready ответ, `reason: naming_not_stable`, без create-stage.
 - Вход: title `РТ / Карточка требования / Контроль срока действия` и остальные create-гейты пройдены → ожидается `✅ Данные для создания epic готовы`.
 - Вход: пользователь подтвердил создание, ERP write успешен, ссылка нормализована → ожидается `✅ Epic создан: <epic_link>`.
 - Вход: пользователь просит cleanup до create, cleanup приводит к semantic drift → ожидается stop/fail без create-stage и без потери исходного intent.

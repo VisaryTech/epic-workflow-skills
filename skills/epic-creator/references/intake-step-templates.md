@@ -2,7 +2,9 @@
 
 Используй эти шаблоны как message patterns для intake-мастера. Не копируй механически, но сохраняй структуру, краткость и привязку к placeholder names.
 
-Если по ходу intake нужно объяснить, почему нельзя идти дальше, используй common `Reason` из `../../../docs/epic-reason-codes.md`, а при необходимости добавляй локальный `Detail` из SKILL.md.
+Если по ходу intake нужно объяснить, почему нельзя идти дальше, сначала дай человекочитаемый итог, а `not_ready`, common reason code из `../../../docs/epic-reason-codes.md` и локальный detail из SKILL.md вынеси в короткую служебную строку.
+
+Человекочитаемые названия placeholder names бери из `../../../docs/epic-template-dictionary.yaml`.
 
 ## Template 1 — base intake
 
@@ -29,12 +31,16 @@
 Использовать, когда не хватает 1-3 placeholder names.
 
 ```md
-Не хватает ещё:
-- `<placeholder-1>`
-- `<placeholder-2>`
-- `<placeholder-3>`
+Не хватает ещё нескольких данных.
+
+Уточните, пожалуйста:
+- <human_readable_label_1>: <what_user_should_provide>
+- <human_readable_label_2>: <what_user_should_provide>
+- <human_readable_label_3>: <what_user_should_provide>
 
 Пришли только их, без переписывания всего эпика.
+
+Служебно: not_ready, reason: missing_input (`<placeholder-1>`, `<placeholder-2>`, `<placeholder-3>`)
 ```
 
 ## Template 3 — supporting detail
@@ -67,16 +73,11 @@
 Использовать, когда отсутствует обязательный `requirement-source`.
 
 ```md
-Status: ❌ failed
-Reason: source_not_provided
-Missing:
-- `requirement-source`
-
-Why it matters:
 Без источника требования нельзя понять основание эпика и проверить, что именно нужно реализовать.
 
-Next step:
 Пришли источник требования: ТЗ, ЧТЗ, встреча, договорённость с ЛПР или другое основание.
+
+Служебно: not_ready, reason: source_not_provided (`requirement-source`)
 ```
 
 ## Template 6 — codebase-check blocker
@@ -84,13 +85,9 @@ Next step:
 Использовать, когда для изменения существующей реализации или спорной delta нужен codebase-check, а без него нельзя надёжно собрать осмысленное описание для create-flow.
 
 ```md
-Status: ❌ failed
-Reason: insufficient_input_for_create
-Detail: codebase_check_required
-
-Why it matters:
 Без проверки текущей реализации нельзя надёжно описать `as-is`, delta и зависимости.
 
-Next step:
 Либо выполни codebase-check, либо пришли подтверждённые данные по текущему состоянию и границам изменения.
+
+Служебно: not_ready, reason: insufficient_input_for_create, detail: codebase_check_required
 ```
