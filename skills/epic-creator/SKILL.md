@@ -29,7 +29,7 @@ description: "Пошаговый мастер создания нового epic
 - Общие operational-правила: `../../docs/epic-skill-baseline.md`
 - Intake/create-поток: `../../docs/epic-readiness-preflight.md`, `../../docs/epic-required-fields.md`, `../../docs/epic-workflow.md`
 - Структура epic и placeholder names: `../../docs/epic-template.md`, `../../docs/epic-template-dictionary.yaml`
-- Content checks и стиль формулировок: `../../docs/epic-quality-gates.md`, `../../docs/epic-writing-style.md`
+- Content checks, naming-check и стиль формулировок: `../../docs/epic-quality-gates.md`, `../../docs/epic-naming.md`, `../../docs/epic-writing-style.md`
 - Common reason codes: `../../docs/epic-reason-codes.md`
 
 В этом skill держи только intake/create-specific контракт. Formal review внутри этого skill не выполняется.
@@ -72,6 +72,9 @@ description: "Пошаговый мастер создания нового epic
 2. **Validate readiness**
    - проверь минимальную обязательность placeholder names для create-stage по `../../docs/epic-required-fields.md`;
    - выполни screening по `../../docs/epic-readiness-preflight.md` и определи исход `not_ready | ready_for_create`;
+   - сформируй `Название epic` и `Краткое описание epic`;
+   - выполни naming-check по `../../docs/epic-naming.md`;
+   - если title не состоит ровно из трёх частей `Подсистема / Блок_или_Модуль / Функционал` или перегружен условиями, деталями, логикой, критериями приёмки либо фразами вида `если`, `при`, `по дате`, `о необходимости`, верни `❌ failed` с common `reason code: naming_not_stable`;
    - если данных недостаточно для осмысленного создания epic, верни common `reason code` + при необходимости `detail reason`.
 
 3. **Optional cleanup before create**
@@ -81,11 +84,14 @@ description: "Пошаговый мастер создания нового epic
    - если cleanup ухудшил текст или привёл к semantic drift, откати правки и сообщи локальную причину.
 
 4. **Offer next step**
+   - перед предложением create явно покажи `Название epic` и `Краткое описание epic`;
    - после успешной проверки готовности предложи только релевантные действия: доработать текст, очистить его от воды или создать epic в ERP;
    - cleanup предлагай по умолчанию как optional шаг, но не запускай без явного запроса или согласия пользователя.
 
 5. **Create epic in ERP**
    - выполняй только после подтверждения пользователя;
+   - перед ERP write повторно проверь, что title прошёл naming-check по `../../docs/epic-naming.md`;
+   - если title не прошёл naming-check, не выполняй create-stage и верни `❌ failed` с `reason code: naming_not_stable`;
    - сначала выполни ERP preflight и получи ERP config через `python scripts/get_erp_envs.py`;
    - используй ERP API;
    - создавай epic без догадок о полях;
@@ -131,6 +137,13 @@ Minimum context:
 
 ```md
 ✅ Данные для создания epic готовы.
+
+Название epic:
+<canonical_title>
+
+Краткое описание epic:
+<short_summary>
+
 Что дальше: доработать описание, очистить текст от воды или создать epic в ERP?
 ```
 
@@ -154,10 +167,14 @@ Minimum context:
 - Не выполняй formal review внутри этого skill.
 - Не подменяй отсутствующие требования собственным дизайном.
 - При исходе `not_ready` не считай epic готовым к созданию.
+- Если title не прошёл naming-check, не создавай epic в ERP.
+- Сначала структура названия, потом сохранение в ERP.
 
 ## Смоук-чек
 
 - Вход: недостаточно данных для `business-goal`, `scope` или `acceptance-criteria` → ожидается `❌ failed` с common `reason code`, списком `missing` и `next step`.
 - Вход: текст готов к созданию, но пользователь ещё не подтвердил create → ожидается `✅ Данные для создания epic готовы`.
+- Вход: title без `/`, из 2/4 частей или с фразами `если`, `при`, `по дате`, `о необходимости` → ожидается `❌ failed`, `reason code = naming_not_stable`, без create-stage.
+- Вход: title `РТ / Карточка требования / Контроль срока действия` и остальные create-гейты пройдены → ожидается `✅ Данные для создания epic готовы`.
 - Вход: пользователь подтвердил создание, ERP write успешен, ссылка нормализована → ожидается `✅ Epic создан: <epic_link>`.
 - Вход: пользователь просит cleanup до create, cleanup приводит к semantic drift → ожидается stop/fail без create-stage и без потери исходного intent.

@@ -62,6 +62,7 @@
 - Явно различай `run status`, `business outcome`, `lifecycle transition` и `sync outcome`.
 - Не маскируй technical failure под business verdict.
 - Не объявляй success, пока не пройдены обязательные completion gates.
+- Для epic create/update/review сначала проверяй структуру названия по `docs/epic-naming.md`, потом выполняй сохранение или положительный lifecycle verdict.
 - Если обязательные side effects входят в контракт skill, они должны быть явно попытаны до финального success-response.
 - Partial или failed sync нельзя скрывать за обычным success-ответом.
 - Вторичные side effects не должны молча откатывать основной результат, если контракт skill явно не требует обратного.
@@ -79,3 +80,4 @@
 - no label/state conflation
 - no hidden partial sync
 - no success before required gates
+- title structure before ERP save

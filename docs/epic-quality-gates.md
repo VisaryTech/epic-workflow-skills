@@ -41,6 +41,12 @@
 - Severity: `critical`
 - Failure action: уточнить объект изменений и область применения.
 
+### 2.1 Title naming compliance
+- Проверка: соответствует ли title обязательному шаблону `Подсистема / Блок_или_Модуль / Функционал` из `docs/epic-naming.md`.
+- Severity: `critical`
+- Failure action: исправить title до трёхчастного предметного названия до create-stage, review approval или следующего значимого перехода.
+- Неправильное именование не считать косметическим дефектом.
+
 ### 3. Business goal clarity
 - Проверка: описаны ли `business-goal`, `problem`, `expected-effect` и не противоречат ли они друг другу.
 - Severity: `major`
