@@ -20,17 +20,6 @@ statuses:
   - key: approved
     label_env: ERP_LABEL_APPROVED
     transitions_to:
-      - plan-to-approve
-
-  - key: plan-to-approve
-    label_env: ERP_LABEL_PLAN_TO_APPROVE
-    transitions_to:
-      - plan-approved
-      - to-define
-
-  - key: plan-approved
-    label_env: ERP_LABEL_PLAN_APPROVED
-    transitions_to:
       - ready
 
   - key: ready
@@ -47,7 +36,5 @@ summaries:
     - to-define
   planning_pipeline:
     - approved
-    - plan-to-approve
-    - plan-approved
   ready:
     - ready

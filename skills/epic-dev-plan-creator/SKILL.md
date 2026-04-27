@@ -18,7 +18,6 @@ description: "Использовать, когда нужно подготови
 Обязательные значения для этого skill:
 - `ERP_LABEL_APPROVED`
 - `ERP_LABEL_EPIC_PLAN`
-- `ERP_LABEL_PLAN_TO_APPROVE`
 
 Если обязательные значения отсутствуют, останавливай preflight с reason code этого skill.
 
@@ -26,6 +25,7 @@ description: "Использовать, когда нужно подготови
 
 - implementation plan хранится в ERP как дочерний epic;
 - дочерний epic плана обязан иметь label `ERP_LABEL_EPIC_PLAN`;
+- готовность плана к декомпозиции подтверждается обычным lifecycle marker `approved` через `ERP_LABEL_APPROVED` на дочернем plan-epic;
 - source of truth для текста плана — описание этого дочернего epic.
 - для одного родительского epic должен использоваться один canonical child plan-epic; дубликаты не создавать.
 
@@ -77,7 +77,7 @@ description: "Использовать, когда нужно подготови
 10. Если child plan-epic уже существует, обнови его описание и используй его как canonical plan-epic для текущего запуска.
 11. Если child plan-epic ещё не существует, создай его под родительским epic и обязательно добавь label `ERP_LABEL_EPIC_PLAN`.
 12. Если canonical child plan-epic уже существовал, обнови его, а не создавай новый дубликат.
-13. После успешного прохождения completion gates установи на canonical child plan-epic expected gate marker `ERP_LABEL_PLAN_TO_APPROVE` только через `PATCH /Epic/command/AddLabel/{planEpicId}` и добавь комментарий о готовности плана.
+13. После успешного прохождения completion gates добавь комментарий о готовности плана к проверке на canonical child plan-epic. Не устанавливай отдельные plan-specific lifecycle labels и не ставь `ERP_LABEL_APPROVED` автоматически; принятие плана к декомпозиции фиксируется отдельной approval/review-процедурой через обычный `ERP_LABEL_APPROVED` на дочернем plan-epic.
 14. Не предлагай пользователю альтернативные варианты сохранения плана вне ERP.
 
 ## Формат результата
@@ -117,7 +117,7 @@ reason: <reason>
 
 ## Смоук-чек
 
-- Вход: валидный `epicId` с expected gate `ERP_LABEL_APPROVED`, уже существующим child plan-epic с label `ERP_LABEL_EPIC_PLAN`, обновлённым без создания дубликата, успешной установкой `ERP_LABEL_PLAN_TO_APPROVE` и комментарием о готовности плана → ожидается `✅ План готов`.
+- Вход: валидный `epicId` с expected gate `ERP_LABEL_APPROVED`, уже существующим child plan-epic с label `ERP_LABEL_EPIC_PLAN`, обновлённым без создания дубликата и комментарием о готовности плана к проверке → ожидается `✅ План готов`.
 - Вход: epic без expected gate marker `ERP_LABEL_APPROVED` → ожидается `❌ failed`, `reason code = epic_not_approved`.
 - Вход: epic без достаточного `requirement-source` или с открытым критичным конфликтом с базой знаний → ожидается `❌ failed` на этапе readiness to planning.
 - Вход: план создан, но комментарий со ссылкой на план не добавился → ожидается `❌ failed`, `reason code = epic_comment_failed`.

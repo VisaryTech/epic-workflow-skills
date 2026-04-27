@@ -20,7 +20,7 @@ Use this file when you need a quick routing table for the local epic skill pack.
 - `skills/epic-dev-plan-creator`
   Build or rebuild the implementation plan as a child ERP epic with label from `ERP_LABEL_EPIC_PLAN`.
 - `skills/epic-task-creator`
-  Turn an approved child plan epic into ERP development tasks.
+  Turn a child plan epic with `ERP_LABEL_EPIC_PLAN` and `approved` lifecycle marker into ERP development tasks.
 - `skills/epic-task-weight-estimator`
   Estimate task weights for all tasks linked to an epic.
 

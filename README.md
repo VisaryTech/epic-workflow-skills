@@ -81,8 +81,6 @@ Copy-Item config/erp-env.json.example ~/.config/erp-env.json
   "ERP_LABEL_TO_APPROVE": "1762",
   "ERP_LABEL_TO_DEFINE": "1785",
   "ERP_LABEL_APPROVED": "1763",
-  "ERP_LABEL_PLAN_TO_APPROVE": "1788",
-  "ERP_LABEL_PLAN_APPROVED": "1789",
   "ERP_LABEL_READY": "1765"
 }
 ```

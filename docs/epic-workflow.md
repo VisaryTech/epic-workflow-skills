@@ -83,7 +83,7 @@
 Переход `to-approve -> approved` допускается только при успешном прохождении knowledge base consistency gate.
 
 ### `to-define`
-Эпик или технический план требуют доработки.
+Эпик требует доработки.
 
 После доработки объект возвращается в `to-approve`.
 
@@ -95,19 +95,15 @@
 - эпик соответствует общим readiness-требованиям;
 - эпик согласован с материалами из `requirement-source`.
 
-Далее агент создаёт дочерний epic технического плана с label, задаваемым через env key `ERP_LABEL_EPIC_PLAN`, после чего этот дочерний epic переводится в `plan-to-approve`.
+Далее агент создаёт дочерний epic технического плана с label, задаваемым через env key `ERP_LABEL_EPIC_PLAN`.
 
-### `plan-to-approve`
-Дочерний epic технического плана с label, задаваемым через env key `ERP_LABEL_EPIC_PLAN`, подготовлен и ожидает проверки TL.
+Дочерний technical plan-epic использует обычный lifecycle marker `approved`, задаваемый через `ERP_LABEL_APPROVED`. `ERP_LABEL_EPIC_PLAN` остаётся только типовым marker'ом дочернего плана и не обозначает lifecycle state.
 
-Результат:
-- план принят → `plan-approved`;
-- план требует доработки → `to-define`.
+Декомпозиция разрешена только если дочерний epic одновременно:
+- имеет label `ERP_LABEL_EPIC_PLAN`;
+- находится в lifecycle state / marker `approved`.
 
-### `plan-approved`
-Дочерний epic технического плана с label, задаваемым через env key `ERP_LABEL_EPIC_PLAN`, утверждён.
-
-Далее агент выполняет декомпозицию, создаёт dev-задачи и связывает их с родительским эпиком и дочерним plan-epic. После этого родительский эпик переводится в `ready`.
+После этого агент выполняет декомпозицию, создаёт dev-задачи и связывает их с родительским эпиком и дочерним plan-epic. Затем родительский эпик переводится в `ready`.
 
 ### `ready`
 Эпик полностью подготовлен к реализации:
@@ -141,10 +137,7 @@ formal review + knowledge base consistency gate
 approved
 создание дочернего technical plan-epic
       ↓
-plan-to-approve
-TL review
-      ↓
-plan-approved
+child plan-epic: ERP_LABEL_EPIC_PLAN + approved
 decomposition
       ↓
 ready

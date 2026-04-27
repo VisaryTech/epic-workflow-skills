@@ -45,14 +45,13 @@
 - `epic_not_approved` — эпик не готов к planning.
 - `plan_epic_create_failed` — не удалось создать дочерний plan-epic в ERP.
 - `plan_epic_update_failed` — не удалось обновить дочерний plan-epic в ERP.
-- `planned_label_set_failed` — не удалось установить label стадии planning.
 - `epic_comment_failed` — не удалось оставить обязательный комментарий в ERP.
 
 ## Decomposition
 
 - `missing_plan_ref` — не передан `epicId`, `planEpicId` или `planEpicUrl`.
 - `plan_not_found` — дочерний plan-epic отсутствует или пуст.
-- `epic_plan_not_approved` — эпик не готов к декомпозиции.
+- `epic_plan_not_approved` — дочерний plan-epic с `ERP_LABEL_EPIC_PLAN` не имеет lifecycle marker/status `approved`.
 - `code_alignment_failed` — декомпозиция не согласуется с текущей реализацией.
 - `task_validation_failed` — задачи не проходят обязательную валидацию.
 - `tasks_create_failed` — не удалось создать задачи в ERP.
