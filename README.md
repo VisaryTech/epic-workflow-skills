@@ -6,9 +6,11 @@
 
 ## Структура
 
+Репозиторий устроен как пакет skills с одним главным skill и набором специализированных дочерних skills. Верхний [`SKILL.md`](SKILL.md) отвечает за маршрутизацию намерения пользователя, а директории `docs/`, `scripts/` и `skills/` задают общую доменную базу, технические утилиты и исполняемые capability-модули.
+
 ```text
 .
-|-- SKILL.md                         # umbrella-skill и правила маршрутизации
+|-- SKILL.md                         # главный skill: маршрутизация и общие правила пакета
 |-- agents/
 |   `-- openai.yaml                  # настройки агента для пакета
 |-- config/
@@ -17,14 +19,14 @@
 |   |-- epic-workflow.md             # человекочитаемые правила процесса
 |   |-- epic-lifecycle.yaml          # machine-readable lifecycle и ERP label mapping
 |   |-- epic-template.md             # шаблон описания эпика
-|   |-- epic-template-dictionary.yaml
-|   |-- epic-required-fields.md
-|   |-- epic-quality-gates.md
-|   |-- epic-readiness-preflight.md
-|   |-- epic-reason-codes.md
-|   |-- epic-writing-style.md
-|   |-- epic-naming.md
-|   `-- epic-glossary.md
+|   |-- epic-template-dictionary.yaml # словарь полей шаблона
+|   |-- epic-required-fields.md       # обязательные поля и проверки заполненности
+|   |-- epic-quality-gates.md         # gates качества для переходов lifecycle
+|   |-- epic-readiness-preflight.md   # preflight перед review/readiness
+|   |-- epic-reason-codes.md          # канонические reason codes
+|   |-- epic-writing-style.md         # правила стиля и формулировок
+|   |-- epic-naming.md                # правила именования
+|   `-- epic-glossary.md             # глоссарий терминов
 |-- references/
 |   `-- skill-map.md                 # краткая карта дочерних skills
 |-- scripts/
@@ -32,25 +34,37 @@
 |   |-- get_erp_envs.py              # диагностика доступных ERP env values
 |   |-- build_erp_url.py             # построение canonical ERP URL
 |   `-- load_epic_lifecycle.py       # загрузка docs/epic-lifecycle.yaml
-|-- skills/
-|   |-- epic-creator/
-|   |-- epic-deduplicator/
-|   |-- epic-reviewer/
-|   |-- epic-refiner/
-|   |-- epic-dev-plan-creator/
-|   |-- epic-task-creator/
-|   `-- epic-task-weight-estimator/
+|-- skills/                          # дочерние skills, выполняющие конкретные операции
+|   |-- epic-creator/                # intake и создание нового epic в ERP
+|   |-- epic-deduplicator/           # очистка текста epic от дублей и шума
+|   |-- epic-reviewer/               # review готовности и lifecycle decision
+|   |-- epic-refiner/                # доработка epic после замечаний
+|   |-- epic-dev-plan-creator/       # создание или обновление implementation plan
+|   |-- epic-task-creator/           # декомпозиция plan-epic в dev-задачи
+|   `-- epic-task-weight-estimator/  # оценка веса задач, связанных с epic
 `-- tests/
     `-- test_scripts.py
 ```
 
 ### Роли основных директорий
 
+- `SKILL.md` - верхнеуровневый entrypoint пакета. Он не реализует все сценарии сам, а выбирает нужный дочерний skill по intent пользователя.
 - `docs/` - общий источник правил, терминов, lifecycle, шаблонов и quality gates. Дочерние skills должны ссылаться на эти документы, а не дублировать общие правила.
-- `skills/` - исполняемый capability-слой. Каждый подкаталог содержит отдельный `SKILL.md` и, при необходимости, свои `references/`, `assets/` или `agents/`.
+- `skills/` - исполняемый capability-слой. Каждый подкаталог содержит отдельный `SKILL.md` со своим контрактом входных данных, preflight, процессом, форматом результата и ограничениями. Если skill нужны локальные примеры, шаблоны или настройки агента, они лежат внутри этого же подкаталога в `references/`, `assets/` или `agents/`.
 - `scripts/` - вспомогательные Python-скрипты для конфигурации и построения ERP-ссылок.
 - `config/` - пример пользовательской ERP-конфигурации. Реальный `erp-env.json` хранится вне репозитория.
-- `references/` - короткие навигационные материалы по пакету.
+- `references/` - короткие навигационные материалы по пакету, в первую очередь карта дочерних skills и их scope.
+- `tests/` - unit-тесты для локальных скриптов и правил загрузки конфигурации/lifecycle.
+
+### Дочерние skills
+
+- `skills/epic-creator` - собирает intake, проверяет обязательные поля и создает новый epic в ERP.
+- `skills/epic-deduplicator` - убирает повторы, лишние формулировки и шум без изменения бизнес-смысла epic.
+- `skills/epic-reviewer` - проверяет готовность epic и возвращает lifecycle decision `approved` или `to-define`.
+- `skills/epic-refiner` - дорабатывает epic по замечаниям review, особенно для возврата из `to-define`.
+- `skills/epic-dev-plan-creator` - готовит implementation plan как дочерний plan-epic с label `ERP_LABEL_EPIC_PLAN`.
+- `skills/epic-task-creator` - декомпозирует approved child plan-epic в ERP dev-задачи с проверкой по текущей кодовой базе.
+- `skills/epic-task-weight-estimator` - оценивает вес задач, связанных с epic.
 
 ## Runtime dependencies
 
