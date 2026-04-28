@@ -2,11 +2,11 @@
 
 Пакет skills для работы с жизненным циклом эпиков: создание, очистка, review, доработка, подготовка плана реализации, декомпозиция в dev-задачи и оценка веса задач.
 
-Главная точка входа - [`SKILL.md`](SKILL.md). Она маршрутизирует запросы в специализированные дочерние skills из [`skills/`](skills).
+Главная точка входа - [`SKILL.md`](SKILL.md). Она маршрутизирует запросы в специализированные дочерние skills из [`subskills/`](subskills).
 
 ## Структура
 
-Репозиторий устроен как пакет skills с одним главным skill и набором специализированных дочерних skills. Верхний [`SKILL.md`](SKILL.md) отвечает за маршрутизацию намерения пользователя, а директории `docs/`, `scripts/` и `skills/` задают общую доменную базу, технические утилиты и исполняемые capability-модули.
+Репозиторий устроен как пакет skills с одним главным skill и набором специализированных дочерних skills. Верхний [`SKILL.md`](SKILL.md) отвечает за маршрутизацию намерения пользователя, а директории `docs/`, `scripts/` и `subskills/` задают общую доменную базу, технические утилиты и исполняемые capability-модули.
 
 ```text
 .
@@ -34,7 +34,7 @@
 |   |-- get_erp_envs.py              # диагностика доступных ERP env values
 |   |-- build_erp_url.py             # построение canonical ERP URL
 |   `-- load_epic_lifecycle.py       # загрузка docs/epic-lifecycle.yaml
-|-- skills/                          # дочерние skills, выполняющие конкретные операции
+|-- subskills/                       # дочерние skills, выполняющие конкретные операции
 |   |-- epic-creator/                # intake и создание нового epic в ERP
 |   |-- epic-deduplicator/           # очистка текста epic от дублей и шума
 |   |-- epic-reviewer/               # review готовности и lifecycle decision
@@ -50,7 +50,7 @@
 
 - `SKILL.md` - верхнеуровневый entrypoint пакета. Он не реализует все сценарии сам, а выбирает нужный дочерний skill по intent пользователя.
 - `docs/` - общий источник правил, терминов, lifecycle, шаблонов и quality gates. Дочерние skills должны ссылаться на эти документы, а не дублировать общие правила.
-- `skills/` - исполняемый capability-слой. Каждый подкаталог содержит отдельный `SKILL.md` со своим контрактом входных данных, preflight, процессом, форматом результата и ограничениями. Если skill нужны локальные примеры, шаблоны или настройки агента, они лежат внутри этого же подкаталога в `references/`, `assets/` или `agents/`.
+- `subskills/` - исполняемый capability-слой. Каждый подкаталог содержит отдельный `SKILL.md` со своим контрактом входных данных, preflight, процессом, форматом результата и ограничениями. Если skill нужны локальные примеры, шаблоны или настройки агента, они лежат внутри этого же подкаталога в `references/`, `assets/` или `agents/`.
 - `scripts/` - вспомогательные Python-скрипты для конфигурации и построения ERP-ссылок.
 - `config/` - пример пользовательской ERP-конфигурации. Реальный `erp-env.json` хранится вне репозитория.
 - `references/` - короткие навигационные материалы по пакету, в первую очередь карта дочерних skills и их scope.
@@ -58,13 +58,13 @@
 
 ### Дочерние skills
 
-- `skills/epic-creator` - собирает intake, проверяет обязательные поля и создает новый epic в ERP.
-- `skills/epic-deduplicator` - убирает повторы, лишние формулировки и шум без изменения бизнес-смысла epic.
-- `skills/epic-reviewer` - проверяет готовность epic и возвращает lifecycle decision `approved` или `to-define`.
-- `skills/epic-refiner` - дорабатывает epic по замечаниям review, особенно для возврата из `to-define`.
-- `skills/epic-dev-plan-creator` - готовит implementation plan как дочерний plan-epic с label `ERP_LABEL_EPIC_PLAN`.
-- `skills/epic-task-creator` - декомпозирует approved child plan-epic в ERP dev-задачи с проверкой по текущей кодовой базе.
-- `skills/epic-task-weight-estimator` - оценивает вес задач, связанных с epic.
+- `subskills/epic-creator` - собирает intake, проверяет обязательные поля и создает новый epic в ERP.
+- `subskills/epic-deduplicator` - убирает повторы, лишние формулировки и шум без изменения бизнес-смысла epic.
+- `subskills/epic-reviewer` - проверяет готовность epic и возвращает lifecycle decision `approved` или `to-define`.
+- `subskills/epic-refiner` - дорабатывает epic по замечаниям review, особенно для возврата из `to-define`.
+- `subskills/epic-dev-plan-creator` - готовит implementation plan как дочерний plan-epic с label `ERP_LABEL_EPIC_PLAN`.
+- `subskills/epic-task-creator` - декомпозирует approved child plan-epic в ERP dev-задачи с проверкой по текущей кодовой базе.
+- `subskills/epic-task-weight-estimator` - оценивает вес задач, связанных с epic.
 
 ## Runtime dependencies
 

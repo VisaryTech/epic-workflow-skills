@@ -98,8 +98,8 @@ class DirectTaskTrackerCallRegressionTests(unittest.TestCase):
         forbidden = [
             "python " + "api.py",
             "TASKTRACKER" + "_DIR",
-            "skills/" + "tasktracker-api",
-            "skills\\" + "tasktracker-api",
+            "subskills/" + "tasktracker-api",
+            "subskills\\" + "tasktracker-api",
             "patch_task_command" + "_change_weight_task_id",
         ]
 
@@ -117,7 +117,7 @@ class DirectTaskTrackerCallRegressionTests(unittest.TestCase):
             "SKILL.md",
             "README.md",
             "references/skill-map.md",
-            "skills/epic-task-weight-estimator/SKILL.md",
+            "subskills/epic-task-weight-estimator/SKILL.md",
         ]
         missing = []
 

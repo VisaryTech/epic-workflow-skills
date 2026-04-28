@@ -5,23 +5,23 @@ Use this file when you need a quick routing table for the local epic skill pack.
 ## Shared Files
 
 - Shared docs live in `docs/`.
-- Local epic skills live in `skills/`.
+- Local epic skills live in `subskills/`.
 
 ## Child Skills
 
-- `skills/epic-creator`
+- `subskills/epic-creator`
   Create a new epic in ERP after collecting and validating the required input.
-- `skills/epic-deduplicator`
+- `subskills/epic-deduplicator`
   Remove duplicated content and verbal noise from an ERP epic.
-- `skills/epic-refiner`
+- `subskills/epic-refiner`
   Rework an epic after review remarks, especially for `to-define` handling.
-- `skills/epic-reviewer`
+- `subskills/epic-reviewer`
   Evaluate epic readiness and return the lifecycle decision.
-- `skills/epic-dev-plan-creator`
+- `subskills/epic-dev-plan-creator`
   Build or rebuild the implementation plan as a child ERP epic with label from `ERP_LABEL_EPIC_PLAN`.
-- `skills/epic-task-creator`
+- `subskills/epic-task-creator`
   Turn a child plan epic with `ERP_LABEL_EPIC_PLAN` and `approved` lifecycle marker into ERP development tasks.
-- `skills/epic-task-weight-estimator`
+- `subskills/epic-task-weight-estimator`
   Estimate task weights for all tasks linked to an epic.
 
 ## Required Installed Skills
