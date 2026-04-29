@@ -9,30 +9,7 @@ Run Status: <in_progress | done | failed>
 Готовность: <APPROVED | TO DEFINE | not_evaluated>
 Reason: <reason_code | none>
 Автор эпика: <AuthorFullName>
-Критические блокеры: <number>
-Разделов с замечаниями: <number>
-
-Сводка по блокам требований:
-- Business requirements: <OK | GAP | RISK | CONFLICT>
-- Stakeholder requirements: <OK | GAP | RISK | CONFLICT>
-- Solution requirements / Functional: <OK | GAP | RISK | CONFLICT>
-- Solution requirements / Non-functional: <OK | GAP | RISK | CONFLICT | N/A>
-- Transition requirements: <OK | GAP | RISK | CONFLICT | N/A>
-- Business rules: <OK | GAP | RISK | CONFLICT | N/A>
-- Assumptions / Constraints / Dependencies: <OK | GAP | RISK | CONFLICT | N/A>
-
-Integration Check:
-- Case: <yes | no>
-- Spec Status: <ok | missing | incomplete | conflict | n/a>
-- Implementation Alignment: <ok | not_checked | conflict | n/a>
-
-Duplicate Check:
-- Status: <exact_duplicate | strong_overlap | partial_overlap | related_only | no_overlap>
-- Findings:
-  - <entity> — <link>
-    - match: <type>
-    - reason: <short explanation>
-- Recommendation: <merge | narrow_scope | add_links | keep_independent | return_to_define>
+Причина: <короткое объяснение verdict, например "3 блокирующих замечания" | none>
 
 Замечания:
 - <Раздел 1>
@@ -48,10 +25,23 @@ Duplicate Check:
   - Нужно уточнить: <что именно требуется>
   - Подтверждение: <цитата или фрагмент эпика>
 
-Что нужно закрыть для APPROVED:
-- <условие 1>
-- <условие 2>
-- <условие 3>
+Что нужно закрыть:
+- [ ] <проверяемое условие 1>
+- [ ] <проверяемое условие 2>
+- [ ] <проверяемое условие 3>
+
+Проверка интеграции:
+- Интеграционный кейс: <да | нет>
+- Спецификация: <человекочитаемый статус>
+- Согласованность с реализацией: <человекочитаемый статус>
+
+Похожие эпики:
+- <нет похожих эпиков | Epic ID/link: <человекочитаемое объяснение сходства и отличия scope>>
+- Рекомендация: <человекочитаемое действие>
+
+ERP:
+- Label sync: <done | skipped | failed> — <reason | none>
+- Comment sync: <done | skipped | failed> — <reason | none>
 ```
 
 Если замечаний нет, явно пиши:
@@ -66,38 +56,26 @@ Duplicate Check:
 
 ```md
 Готовность: <APPROVED | TO DEFINE | not_evaluated>
-Автор эпика: <AuthorFullName>
-Ссылка: <epic_url>
-Критические блокеры: <number>
-Разделов с замечаниями: <number>
+Причина: <короткое объяснение verdict, например "3 блокирующих замечания" | none>
+Автор: <AuthorFullName>
+Эпик: <epic_url>
 
-Сводка по блокам требований:
-- Business requirements: <status>
-- Stakeholder requirements: <status>
-- Functional: <status>
-- Non-functional: <status>
-- Transition: <status>
-- Business rules: <status>
-- Assumptions / Constraints / Dependencies: <status>
+Блокирует APPROVED:
+1. <краткое блокирующее замечание 1>
+2. <краткое блокирующее замечание 2>
 
-Integration Check:
-- Case: <yes | no>
-- Spec Status: <ok | missing | incomplete | conflict | n/a>
-- Implementation Alignment: <ok | not_checked | conflict | n/a>
+Что нужно закрыть:
+[ ] <проверяемое условие 1>
+[ ] <проверяемое условие 2>
 
-Duplicate Check:
-- Status: <exact_duplicate | strong_overlap | partial_overlap | related_only | no_overlap>
-- Findings:
-  - <entity> — <link>: <short explanation>
-- Recommendation: <merge | narrow_scope | add_links | keep_independent | return_to_define>
+Проверка интеграции:
+- Спецификация: <человекочитаемый статус>
+- Согласованность с реализацией: <человекочитаемый статус>
 
-Ключевые замечания:
-- <краткое замечание 1>
-- <краткое замечание 2>
+Похожие эпики:
+- <нет похожих эпиков | Epic ID/link: <человекочитаемое объяснение сходства и отличия scope>>
 
-Что нужно закрыть для APPROVED:
-- <условие 1>
-- <условие 2>
+ERP: <комментарий добавлен/не добавлен, статус переведён/не переведён, причина при partial/failed>
 ```
 
 ## Rules
@@ -109,6 +87,10 @@ Duplicate Check:
 - `Reason` = конкретный code только при preflight failure, guardrail stop или явной подмене требований реализацией.
 - Во всех остальных случаях `Reason: none`.
 - В compact template для чата не выводи поля `Run Status` и `Reason`.
-- Не меняй названия секций.
+- Compact template ориентирован на автора эпика: сначала verdict, затем blockers, затем проверяемые действия.
+- В compact template не выводи внутренние категории проверки и методологические классификации требований.
+- В compact template не используй технические enum-значения как основные статусы. Переводи их в человекочитаемый русский текст: `missing` → `отсутствует`, `not_checked` → `не проверялась`, `related_only` → `похожий эпик, scope отличается`, `add_links` → `добавить ссылку/контекст`.
+- Не меняй названия секций из выбранного шаблона.
 - Не добавляй перед шаблоном или между секциями operational-progress текст.
-- Не убирай секцию `Что нужно закрыть для APPROVED`, даже если замечаний мало.
+- Не убирай секцию `Что нужно закрыть`, даже если замечаний мало.
+- Если блокирующих замечаний нет, в compact template пиши `Блокирует APPROVED: нет`.
