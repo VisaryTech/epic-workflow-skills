@@ -12,7 +12,7 @@ Reason: <reason_code | none>
 Критические блокеры: <number>
 Разделов с замечаниями: <number>
 
-Сводка по BABOK-блокам:
+Сводка по блокам требований:
 - Business requirements: <OK | GAP | RISK | CONFLICT>
 - Stakeholder requirements: <OK | GAP | RISK | CONFLICT>
 - Solution requirements / Functional: <OK | GAP | RISK | CONFLICT>
@@ -71,7 +71,7 @@ Duplicate Check:
 Критические блокеры: <number>
 Разделов с замечаниями: <number>
 
-Сводка по BABOK-блокам:
+Сводка по блокам требований:
 - Business requirements: <status>
 - Stakeholder requirements: <status>
 - Functional: <status>
