@@ -2,11 +2,7 @@
 
 Пакет skills для работы с жизненным циклом эпиков: создание, очистка, review, доработка, подготовка плана реализации, декомпозиция в dev-задачи и оценка веса задач.
 
-Главная точка входа - [`SKILL.md`](SKILL.md). Она маршрутизирует запросы в специализированные дочерние skills из [`subskills/`](subskills).
-
 ## Структура
-
-Репозиторий устроен как пакет skills с одним главным skill и набором специализированных дочерних skills. Верхний [`SKILL.md`](SKILL.md) отвечает за маршрутизацию намерения пользователя, а директории `docs/`, `scripts/` и `subskills/` задают общую доменную базу, технические утилиты и исполняемые capability-модули.
 
 ```text
 .
@@ -46,32 +42,9 @@
     `-- test_scripts.py
 ```
 
-### Роли основных директорий
-
-- `SKILL.md` - верхнеуровневый entrypoint пакета. Он не реализует все сценарии сам, а выбирает нужный дочерний skill по intent пользователя.
-- `docs/` - общий источник правил, терминов, lifecycle, шаблонов и quality gates. Дочерние skills должны ссылаться на эти документы, а не дублировать общие правила.
-- `subskills/` - исполняемый capability-слой. Каждый подкаталог содержит отдельный `SKILL.md` со своим контрактом входных данных, preflight, процессом, форматом результата и ограничениями. Если skill нужны локальные примеры, шаблоны или настройки агента, они лежат внутри этого же подкаталога в `references/`, `assets/` или `agents/`.
-- `scripts/` - вспомогательные Python-скрипты для конфигурации и построения ERP-ссылок.
-- `config/` - пример пользовательской ERP-конфигурации. Реальный `erp-env.json` хранится вне репозитория.
-- `references/` - короткие навигационные материалы по пакету, в первую очередь карта дочерних skills и их scope.
-- `tests/` - unit-тесты для локальных скриптов и правил загрузки конфигурации/lifecycle.
-
-### Дочерние skills
-
-- `subskills/epic-creator` - собирает intake, проверяет обязательные поля и создает новый epic в ERP.
-- `subskills/epic-deduplicator` - убирает повторы, лишние формулировки и шум без изменения бизнес-смысла epic.
-- `subskills/epic-reviewer` - проверяет готовность epic и возвращает lifecycle decision `approved` или `to-define`.
-- `subskills/epic-refiner` - дорабатывает epic по замечаниям review, особенно для возврата из `to-define`.
-- `subskills/epic-dev-plan-creator` - готовит implementation plan как дочерний plan-epic с label `ERP_LABEL_EPIC_PLAN`.
-- `subskills/epic-task-creator` - декомпозирует approved child plan-epic в ERP dev-задачи с проверкой по текущей кодовой базе.
-- `subskills/epic-task-weight-estimator` - оценивает вес задач, связанных с epic.
-
 ## Runtime dependencies
 
-- Для ERP TaskTracker read/write операций должен быть установлен `visary-cloud-api-skills`.
-- Этот пакет использует TaskTracker API capability внутри `visary-cloud-api-skills`.
-- Локальные скрипты этого репозитория не вызывают внутренние API CLI-скрипты `visary-cloud-api-skills` напрямую.
-- ERP-конфиг хранится отдельно в `~/.config/erp-env.json`.
+- Для ERP TaskTracker read/write операций должен быть установлен [visary-cloud-api-skills](https://github.com/VisaryTech/visary-cloud-api-skills).
 
 ## Конфигурация
 
